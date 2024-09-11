@@ -1,7 +1,7 @@
 package Game;
 public class Stone {
 
-    private String col;
+    private final String col;
 
     public Stone(String col) {
         this.col = col;

@@ -63,9 +63,25 @@ public class Game {
 
     public boolean moveStone(String Colour, String from, String to) {
         int[] fromInt = gameUtils.translatePosition(from);
-        int[] toInt = gameUtils.translatePosition(to);
+        int fromX = fromInt[0];
+        int fromY = fromInt[1];
 
-        return gameUtils.moveStone(board, Colour, fromInt[0], fromInt[1], toInt[0], toInt[1], size, false);
+        int[] toInt = gameUtils.translatePosition(to);
+        int toX = toInt[0];
+        int toY = toInt[1];
+
+        // * Flip the Y since board starts bot left not top left
+        fromY = size - fromY;
+        toY = size - toY;
+
+
+        if (gameUtils.isValidMove(board, Colour, fromX, fromY, toX, toY, size, true)) {
+            // If the move succeeds all above checks, we can play the move on the board
+            board[toY][toX].placeStone(board[fromY][fromX].removeStone());     // Place the stone in destination cell
+            return true;
+        }
+
+        return false;
     }
 
     public boolean gameOver() {

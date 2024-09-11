@@ -1,6 +1,7 @@
 package Utils;
 
 import Game.Cell;
+import Game.Stone;
 
 public class GameUtils {
 
@@ -46,115 +47,120 @@ public class GameUtils {
         System.out.println();
     }
 
-    public boolean moveStone(Cell[][] board, String Colour, int fromX, int fromY, int toX, int toY, int size, boolean DEBUG) {
+    public boolean isValidMove(Cell[][] board, String playerColour, int fromX, int fromY, int toX, int toY, int size, boolean DEBUG) {
+        // Define constants for colours
+        final String WHITE = "WHITE";
+        final String BLACK = "BLACK";
 
-        fromY = size - fromY;
-        toY = size - toY;
-
-        // * Check if the given positions are within bounds of the game
-        if (fromX >= 0 && fromX < size && fromY >= 0 && fromY < size &&
-            toX >= 0 && toX < size && toY >= 0 && toY < size) {
-
-            Cell sourceCell = board[fromY][fromX];
-            Cell destinationCell = board[toY][toX];
-
-            // * Check if the source cell has a stone
-            if (sourceCell.hasStone()) {
-                String colour = sourceCell.getStone().getCol();
-
-                // * Check if user is trying to move the correct stone
-                if (!colour.equals(Colour)) {
-                    System.out.println("You cannot move your oppononent's stone");
-                    return false;
-                }
-
-                // * Check if the user is going to a free cell
-                if (destinationCell.hasStone()) {
-                    System.out.println("You cannot move on a stone.");
-                    return false;
-                }
-
-                // ! Normal moves and attack moves
-
-                if (colour.equals("WHITE")) {
-                    if (fromX == toX && fromY == toY + 1) {
-                        System.out.println("Normal move forward");
-
-                    } else if (fromX == toX + 1 && fromY == toY) {
-                        System.out.println("Normal move left");
-
-                    } else if (fromX == toX - 1 && fromY == toY) {
-                        System.out.println("Normal move right");
-
-                    } else if (fromX == toX + 2 && fromY == toY + 2) {
-                        Cell attackedCell = board[fromY - 1][fromX - 1];
-                        if (attackedCell.hasStone() && attackedCell.getStone().getCol().equals("BLACK")) {
-                            attackedCell.removeStone();
-                            System.out.println("Attack move left");
-                        } else {
-                            System.out.println("This attack move isn't legal.");
-                            return false;
-                        }                    
-                    } else if (fromX == toX - 2 && fromY == toY + 2) {
-                        Cell attackedCell = board[fromY - 1][fromX + 1];
-                        System.out.println(fromX);
-                        System.out.println(fromY);
-                        if (attackedCell.hasStone() && attackedCell.getStone().getCol().equals("BLACK")) {
-                            attackedCell.removeStone();
-                            System.out.println("Attack move right");
-                        } else {
-                            System.out.println("This attack move isn't legal.");
-                            return false;
-                        }
-                    } else {
-                        System.out.println("This normal move isn't legal.");
-                        return false;
-                    }
-
-                } else if (colour.equals("BLACK")) {
-                    if (fromX == toX && fromY == toY - 1) {
-                        System.out.println("Normal move forward");
-                    } else if (fromX == toX + 1 && fromY == toY) {
-                        System.out.println("Normal move left");
-                    } else if (fromX == toX - 1 && fromY == toY) {
-                        System.out.println("Normal move right");
-                    } else if (fromX == toX + 2 && fromY == toY - 2) {
-                        Cell attackedCell = board[fromY + 1][fromX - 1];
-                        if (attackedCell.hasStone() && attackedCell.getStone().getCol().equals("WHITE")) {
-                            attackedCell.removeStone();
-                            System.out.println("Attack move right");
-                        } else {
-                            System.out.println("This attack move isn't legal.");
-                            return false;
-                        }                
-                    } else if (fromX == toX - 2 && fromY == toY - 2) {
-                        Cell attackedCell = board[fromY + 1][fromX + 1];
-                        if (attackedCell.hasStone() && attackedCell.getStone().getCol().equals("WHITE")) {
-                            attackedCell.removeStone();
-                            System.out.println("Attack move right");
-                        } else {
-                            System.out.println("This attack move isn't legal.");
-                            return false;
-                        }  
-                    } else {
-                        System.out.println("This normal move isn't legal.");
-                        return false;
-                    }
-                }
-                    
-                
-                // If the move succeeds all above checks, we can play the move on the board
-                destinationCell.placeStone(sourceCell.removeStone());     // Place the stone in destination cell
-                return true;
-
-            } else {
-                System.out.println("No stone to move in the source cell.");
-                return false; // Move failed
-            }
-        } else {
-            System.out.println("Invalid coordinates.");
-            return false; // Move failed
+        // Check if the coordinates are within bounds
+        if (!isInBounds(fromX, fromY, size) || !isInBounds(toX, toY, size)) {
+            if (DEBUG) System.out.println("Invalid coordinates.");
+            return false;
         }
+
+        Cell sourceCell = board[fromY][fromX];
+        Cell destinationCell = board[toY][toX];
+
+        // Check if there is a stone in the source cell
+        if (!sourceCell.hasStone()) {
+            if (DEBUG) System.out.println("No stone to move in the source cell.");
+            return false;
+        }
+
+        String stoneColour = sourceCell.getStone().getCol();
+
+        // Check if the stone belongs to the player
+        if (!stoneColour.equals(playerColour)) {
+            if (DEBUG) System.out.println("You cannot move your opponent's stone.");
+            return false;
+        }
+
+        // Check if the destination cell is free
+        if (destinationCell.hasStone()) {
+            if (DEBUG) System.out.println("You cannot move onto a stone.");
+            return false;
+        }
+
+        // Process moves based on the stone colour
+        if (stoneColour.equals(WHITE)) {
+            return processWhiteMove(board, fromX, fromY, toX, toY, DEBUG);
+        } else if (stoneColour.equals(BLACK)) {
+            return processBlackMove(board, fromX, fromY, toX, toY, DEBUG);
+        }
+
+        // If we reach here, something went wrong
+        return false;
     }
+
+    // Helper function to check if coordinates are within bounds
+    private boolean isInBounds(int x, int y, int size) {
+        return x >= 0 && x < size && y >= 0 && y < size;
+    }
+
+    // Process the move logic for white stones
+    private boolean processWhiteMove(Cell[][] board, int fromX, int fromY, int toX, int toY, boolean DEBUG) {
+        // Normal forward move
+        if (fromX == toX && fromY == toY + 1) {
+            if (DEBUG) System.out.println("Normal move forward.");
+            return true;
+        }
+
+        // Normal side moves
+        if ((fromX == toX + 1 || fromX == toX - 1) && fromY == toY) {
+            if (DEBUG) System.out.println("Normal move sideways.");
+            return true;
+        }
+
+        // Attack moves
+        if (fromX == toX + 2 && fromY == toY + 2) {
+            return checkAttackMove(board, fromX - 1, fromY - 1, "BLACK", DEBUG, "Attack move left");
+        }
+        if (fromX == toX - 2 && fromY == toY + 2) {
+            return checkAttackMove(board, fromX + 1, fromY - 1, "BLACK", DEBUG, "Attack move right");
+        }
+
+        if (DEBUG) System.out.println("This move isn't legal for WHITE.");
+        return false;
+    }
+
+    // Process the move logic for black stones
+    private boolean processBlackMove(Cell[][] board, int fromX, int fromY, int toX, int toY, boolean DEBUG) {
+        // Normal forward move
+        if (fromX == toX && fromY == toY - 1) {
+            if (DEBUG) System.out.println("Normal move forward.");
+            return true;
+        }
+
+        // Normal side moves
+        if ((fromX == toX + 1 || fromX == toX - 1) && fromY == toY) {
+            if (DEBUG) System.out.println("Normal move sideways.");
+            return true;
+        }
+
+        // Attack moves
+        if (fromX == toX + 2 && fromY == toY - 2) {
+            return checkAttackMove(board, fromX - 1, fromY + 1, "WHITE", DEBUG, "Attack move right");
+        }
+        if (fromX == toX - 2 && fromY == toY - 2) {
+            return checkAttackMove(board, fromX + 1, fromY + 1, "WHITE", DEBUG, "Attack move left");
+        }
+
+        if (DEBUG) System.out.println("This move isn't legal for BLACK.");
+        return false;
+    }
+
+    // Helper function to check if an attack move is valid
+    private boolean checkAttackMove(Cell[][] board, int attackX, int attackY, String opponentColour, boolean DEBUG, String message) {
+        Cell attackedCell = board[attackY][attackX];
+
+        if (attackedCell.hasStone() && attackedCell.getStone().getCol().equals(opponentColour)) {
+            if (DEBUG) System.out.println(message);
+            return true;
+        }
+
+        if (DEBUG) System.out.println("This attack move isn't legal.");
+        return false;
+    }
+
     
 }

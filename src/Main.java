@@ -25,7 +25,7 @@ public class Main {
         
         while (playing) {
 
-            gameUtils.printBoard(abnm.cloneBoard(game.getBoard()), 9);
+            //gameUtils.printBoard(abnm.cloneBoard(game.getBoard()), 9);
 
             boolean succesW = false;
             boolean succesB = false;
@@ -49,7 +49,7 @@ public class Main {
                 //String stoneUserW = randomBot.makeMove();
                 //String cellUserW = randomBot.makeMove();
 
-                succesW = game.moveStone("WHITE", stoneUserW, cellUserW);
+                //succesW = game.moveStone("WHITE", stoneUserW, cellUserW);
             }
 
             gameUtils.printBoard(game.getBoard(), 9);
