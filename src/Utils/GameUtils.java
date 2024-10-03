@@ -3,7 +3,82 @@ package Utils;
 import Game.Cell;
 import Game.Stone;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class GameUtils {
+
+    public void placeStone(Cell[][] board, int size, int x, int y, Stone stone) {
+        if (x >= 0 && x < size && y >= 0 && y < size) {
+            board[x][y].placeStone(stone);
+        } else {
+            System.out.println("Invalid coordinates.");
+        }
+    }
+
+    public void removeStone(Cell[][] board, int size, int x, int y) {
+        if (x >= 0 && x < size && y >= 0 && y < size) {
+            board[x][y].removeStone();
+        } else {
+            System.out.println("Invalid coordinates.");
+        }
+    }
+
+        // Method with String inputs
+    public boolean moveStone(Cell[][] board, int size, String Colour, String from, String to, boolean DEBUG) {
+        int[] fromInt = translatePosition(from);
+        int fromX = fromInt[0];
+        int fromY = fromInt[1];
+
+        int[] toInt = translatePosition(to);
+        int toX = toInt[0];
+        int toY = toInt[1];
+        
+
+
+        return moveStone(board, size, Colour, fromX, fromY, toX, toY, DEBUG);
+    }
+
+    // Overloaded method with int inputs
+    public boolean moveStone(Cell[][] board, int size, String Colour, int fromX, int fromY, int toX, int toY, boolean DEBUG) {
+        // Check if the move is valid without modifying the board
+        if (isValidMove(board, Colour, fromX, fromY, toX, toY, size, DEBUG)) {
+
+            // If it's an attack move (check if the move is two steps diagonally)
+            if (Math.abs(fromX - toX) == 2 && Math.abs(fromY - toY) == 2) {
+                // Calculate the coordinates of the attacked stone
+                int attackX = (fromX + toX) / 2;
+                int attackY = (fromY + toY) / 2;
+
+                // Remove the attacked stone
+                board[attackY][attackX].removeStone();
+            }
+
+            // Play the move on the board
+            board[toY][toX].placeStone(board[fromY][fromX].removeStone()); // Place the stone in the destination cell
+            return true;
+        }
+
+        return false;
+    }
+
+    
+
+    public int gameOver(Cell[][] board, int size) {
+        for (int i = 0; i < size; i++) {
+            if (board[0][i].hasStone() && board[0][i].getStone().getColour().equals("WHITE")) {
+                return 1;
+            }
+        }
+
+        for (int i = 0; i < size; i++) {
+            if (board[size-1][i].hasStone() && board[size-1][i].getStone().getColour().equals("BLACK")) {
+                return 2;
+            }
+        }
+
+        return 0;
+    }
 
     public int[] translatePosition(String pos) {
         try {
@@ -15,7 +90,7 @@ public class GameUtils {
             int x = letter - 'a';
             
             // Translate number to y-coordinate (0-based index)
-            int y = number;
+            int y = 9-number;
             
             // Return the coordinates as an array [x, y]
             return new int[]{x, y};
@@ -24,6 +99,23 @@ public class GameUtils {
             return new int[]{-1, -1};
         }
     }
+
+    public String translateCoordinates(int x, int y) {
+        try {
+            // Translate x-coordinate (0-based index) to letter
+            char letter = (char) ('a' + x);
+            
+            // Translate y-coordinate (0-based index) to number
+            int number = 9 - y;
+            
+            // Return the position as a string "letter + number"
+            return String.valueOf(letter) + number;
+    
+        } catch (Exception e) {
+            return null;  // Return null in case of an error
+        }
+    }
+    
 
     public void printBoard(Cell[][] board, int size) {    
         // Print the board with y-axis labels and board content
@@ -67,7 +159,7 @@ public class GameUtils {
             return false;
         }
 
-        String stoneColour = sourceCell.getStone().getCol();
+        String stoneColour = sourceCell.getStone().getColour();
 
         // Check if the stone belongs to the player
         if (!stoneColour.equals(playerColour)) {
@@ -153,7 +245,7 @@ public class GameUtils {
     private boolean checkAttackMove(Cell[][] board, int attackX, int attackY, String opponentColour, boolean DEBUG, String message) {
         Cell attackedCell = board[attackY][attackX];
 
-        if (attackedCell.hasStone() && attackedCell.getStone().getCol().equals(opponentColour)) {
+        if (attackedCell.hasStone() && attackedCell.getStone().getColour().equals(opponentColour)) {
             if (DEBUG) System.out.println(message);
             return true;
         }
@@ -161,6 +253,72 @@ public class GameUtils {
         if (DEBUG) System.out.println("This attack move isn't legal.");
         return false;
     }
+
+
+
+
+    public List<int[]> getValidMoves(int fromX, int fromY, Cell[][] board, int size, boolean DEBUG) {
+        List<int[]> validMoves = new ArrayList<>();
+    
+        // Get the coordinates of the current cell
+        Cell sourceCell = board[fromY][fromX];
+    
+        // Check if the cell contains a stone
+        if (!sourceCell.hasStone()) {
+            if (DEBUG) System.out.println("No stone in the given cell.");
+            return validMoves;
+        }
+    
+        String playerColour = sourceCell.getStone().getColour();        
+    
+        // Directions for white stones
+        if (playerColour.equals("WHITE")) {
+            int[][] directionsW = {
+                {-1, 0},  // Up 
+                {0, 1},  // Right
+                {0, -1},  // Left
+                {-2, 2}, // Attack Right
+                {-2, -2}   // Attack Left
+            };
+    
+            for (int[] move : directionsW) {
+                int toY = fromY + move[0];
+                int toX = fromX + move[1];
+
+            
+    
+                if (isValidMove(board, playerColour, fromX, fromY, toX, toY, size, DEBUG)) {
+                    // Add {fromX, fromY, toX, toY} to the valid moves list
+                    validMoves.add(new int[]{fromX, fromY, toX, toY});
+                }
+            }
+        }
+    
+        // Directions for black stones
+        if (playerColour.equals("BLACK")) {
+            int[][] directionsB = {
+                {1, 0},  // Up 
+                {0, -1},   // Right
+                {0, 1},  // Left
+                {2, -2},  // Attack Right
+                {2, 2}  // Attack Left
+            };
+    
+            for (int[] move : directionsB) {
+                int toY = fromY + move[0];
+                int toX = fromX + move[1];
+    
+                if (isValidMove(board, playerColour, fromX, fromY, toX, toY, size, DEBUG)) {
+                    // Add {fromX, fromY, toX, toY} to the valid moves list
+                    validMoves.add(new int[]{fromX, fromY, toX, toY});
+                }
+            }
+        }
+    
+        return validMoves;
+    }
+    
+
 
     
 }

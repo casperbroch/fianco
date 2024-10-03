@@ -39,70 +39,17 @@ public class Game {
         String[] diagW = {"b2", "c3", "d4", "f4", "g3", "h2"};
         String[] diagB = {"b8", "c7", "d6", "f6", "g7", "h8"};
         for (int i=0; i<6; i++) {
-            board[size-gameUtils.translatePosition(diagW[i])[1]][gameUtils.translatePosition(diagW[i])[0]].placeStone(new Stone("WHITE"));
-            board[size-gameUtils.translatePosition(diagB[i])[1]][gameUtils.translatePosition(diagB[i])[0]].placeStone(new Stone("BLACK"));
+            board[gameUtils.translatePosition(diagW[i])[1]][gameUtils.translatePosition(diagW[i])[0]].placeStone(new Stone("WHITE"));
+            board[gameUtils.translatePosition(diagB[i])[1]][gameUtils.translatePosition(diagB[i])[0]].placeStone(new Stone("BLACK"));
         }
     }
 
-
-    public void placeStone(int x, int y, Stone stone) {
-        if (x >= 0 && x < size && y >= 0 && y < size) {
-            board[x][y].placeStone(stone);
-        } else {
-            System.out.println("Invalid coordinates.");
-        }
-    }
-
-    public void removeStone(int x, int y) {
-        if (x >= 0 && x < size && y >= 0 && y < size) {
-            board[x][y].removeStone();
-        } else {
-            System.out.println("Invalid coordinates.");
-        }
-    }
-
-    public boolean moveStone(String Colour, String from, String to) {
-        int[] fromInt = gameUtils.translatePosition(from);
-        int fromX = fromInt[0];
-        int fromY = fromInt[1];
-
-        int[] toInt = gameUtils.translatePosition(to);
-        int toX = toInt[0];
-        int toY = toInt[1];
-
-        // * Flip the Y since board starts bot left not top left
-        fromY = size - fromY;
-        toY = size - toY;
-
-
-        if (gameUtils.isValidMove(board, Colour, fromX, fromY, toX, toY, size, true)) {
-            // If the move succeeds all above checks, we can play the move on the board
-            board[toY][toX].placeStone(board[fromY][fromX].removeStone());     // Place the stone in destination cell
-            return true;
-        }
-
-        return false;
-    }
-
-    public boolean gameOver() {
-        for (int i = 0; i < size; i++) {
-            if (board[0][i].hasStone() && board[0][i].getStone().getCol().equals("WHITE")) {
-                System.out.println("WHITE WON!");
-                return true;
-            }
-        }
-
-        for (int i = 0; i < size; i++) {
-            if (board[size-1][i].hasStone() && board[size-1][i].getStone().getCol().equals("BLACK")) {
-                System.out.println("BLACK WON!");
-                return true;
-            }
-        }
-
-        return false;
-    }
 
     public Cell[][] getBoard() {
         return board;
+    }
+
+    public int getSize() {
+        return size;
     }
 }

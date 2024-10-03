@@ -7,7 +7,11 @@ public class Stone {
         this.col = col;
     }
 
-    public String getCol() {
+    public Stone(Stone other) {
+        this.col = other.col;
+    }
+
+    public String getColour() {
         return this.col;
     }
     
@@ -15,4 +19,6 @@ public class Stone {
     public String toString() {
         return "Stone{colour=" + col + "'}'";
     }
+
+    
 }
