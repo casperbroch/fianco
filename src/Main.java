@@ -1,7 +1,8 @@
 import java.util.Scanner;
 
 import Bots.RandomBot;
-import Bots.abNM;
+import Bots.Minimax;
+import Bots.NegaMaxAB;
 import Utils.BotUtils;
 import Utils.GameUtils;
 import Game.Cell;
@@ -15,14 +16,16 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         boolean playing = true;
         GameUtils gameUtils = new GameUtils();
-        abNM abnm = new abNM();
+        BotUtils botUtils = new BotUtils();
+        Minimax minimax = new Minimax();
         RandomBot randomBot = new RandomBot();
+        NegaMaxAB negaMaxAB = new NegaMaxAB();
 
         // Ask who will play as WHITE and BLACK
-        System.out.println("Who will play as WHITE? (Enter 'user', 'random', or 'negamax')");
+        System.out.println("Who will play as WHITE? (Enter 'user', 'random', 'miniamx', or 'negamax')");
         String whitePlayer = scanner.nextLine().toLowerCase();
 
-        System.out.println("Who will play as BLACK? (Enter 'user', 'random', or 'negamax')");
+        System.out.println("Who will play as BLACK? (Enter 'user', 'random', 'minimax', or 'negamax')");
         String blackPlayer = scanner.nextLine().toLowerCase();
 
         gameUtils.printBoard(game.getBoard(), 9);
@@ -44,14 +47,24 @@ public class Main {
                     // Random bot's turn
                     String stoneUserW = randomBot.makeMove();
                     String cellUserW = randomBot.makeMove();
-                    succesW = gameUtils.moveStone(game.getBoard(), game.getSize(), "WHITE", stoneUserW, cellUserW, true);
+                    succesW = gameUtils.moveStone(game.getBoard(), game.getSize(), "WHITE", stoneUserW, cellUserW, false);
+
+
+                //! ! ! ! ! ! ! ! !  ! ! ! !  ! !   ! ! ! !  !
+                } else if (whitePlayer.equals("minimax")) {
+                    // Minimax bot's turn
+                    succesW = minimax.makeMinimaxMove("WHITE", game.getBoard(),3);
                 } else if (whitePlayer.equals("negamax")) {
                     // Minimax bot's turn
-                    succesW = abnm.makeNegamaxMove("WHITE", game.getBoard(), 3);
-                }
+                    succesW = negaMaxAB.makeNMMove("WHITE", game.getBoard(), 7);
+                } 
+
+
+
             }
 
             gameUtils.printBoard(game.getBoard(), game.getSize());
+            System.out.println(botUtils.evalBoard(game.getBoard(), "WHITE"));
             if (!(gameUtils.gameOver(game.getBoard(), game.getSize()) == 0)) {
                 if (gameUtils.gameOver(game.getBoard(), game.getSize()) == 1) {
                     System.out.println("WHITE WON!");
@@ -75,13 +88,24 @@ public class Main {
                     String stoneUserB = randomBot.makeMove();
                     String cellUserB = randomBot.makeMove();
                     succesB = gameUtils.moveStone(game.getBoard(), game.getSize(), "BLACK", stoneUserB, cellUserB, true);
+                
+
+                //! ! ! ! ! !  ! ! ! !  ! ! !  ! ! ! !  ! ! ! ! 
+                } else if (blackPlayer.equals("minimax")) {
+                    // Minimax bot's turn
+                    succesB = minimax.makeMinimaxMove("BLACK", game.getBoard(), 4);
+
                 } else if (blackPlayer.equals("negamax")) {
                     // Minimax bot's turn
-                    succesB = abnm.makeNegamaxMove("BLACK", game.getBoard(), 3);
+                    succesB = negaMaxAB.makeNMMove("BLACK", game.getBoard(), 7);
                 }
+
+
+
             }
 
             gameUtils.printBoard(game.getBoard(), game.getSize());
+            System.out.println(botUtils.evalBoard(game.getBoard(), "WHITE"));
             if (!(gameUtils.gameOver(game.getBoard(), game.getSize()) == 0)) {
                 if (gameUtils.gameOver(game.getBoard(), game.getSize()) == 1) {
                     System.out.println("WHITE WON!");

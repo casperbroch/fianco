@@ -5,7 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import Game.Cell;
 import Game.Game;
-import Bots.abNM;
+import Bots.Minimax;
 import Utils.GameUtils;
 
 public class GameGUI extends JFrame {
@@ -22,14 +22,14 @@ public class GameGUI extends JFrame {
     private JButton[][] buttons;
     private JComboBox<String> whitePlayerChoice;
     private JComboBox<String> blackPlayerChoice;
-    private abNM abnm;
+    private Minimax minimax;
     private GameUtils gameUtils;
 
     public GameGUI(Game game) {
         this.game = game;
         this.boardSize = game.getSize();
         this.buttons = new JButton[boardSize][boardSize];  // Store buttons to update their size
-        this.abnm = new abNM();
+        this.minimax = new Minimax();
         this.gameUtils = new GameUtils();
 
         // Set up the frame
@@ -176,13 +176,13 @@ private void startGame() {
                 if (whiteTurn) {
                     // White's turn
                     whiteTimer.start();
-                    abnm.makeNegamaxMove("WHITE", game.getBoard(),4);
+                    minimax.makeMinimaxMove("WHITE", game.getBoard(),4);
                     whiteTimer.stop();
                     updateBoard();
                     logMove("WHITE made a move.");
                 } else {
                     // Black's turn
-                    abnm.makeNegamaxMove("BLACK", game.getBoard(), 4);
+                    minimax.makeMinimaxMove("BLACK", game.getBoard(), 4);
                     updateBoard();
                     logMove("BLACK made a move.");
                 }

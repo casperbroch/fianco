@@ -9,19 +9,19 @@ import Utils.GameUtils;
 import Game.Cell;
 import Game.Game;
 
-public class abNM {
+public class Minimax {
 
     BotUtils botUtils;
     GameUtils gameUtils;
     private int nodeCount; // To track the number of nodes discovered
 
-    public abNM() {
+    public Minimax() {
         botUtils = new BotUtils();
         gameUtils = new GameUtils();
         nodeCount = 0; // Initialize the node counter
     }
 
-    public boolean makeNegamaxMove(String player, Cell[][] board, int d) {
+    public boolean makeMinimaxMove(String player, Cell[][] board, int d) {
         nodeCount = 0; // Reset node count at the beginning of a new move
         long startTime = System.nanoTime(); // Start timing
         Cell[][] currentBoard = cloneBoard(board);
@@ -32,7 +32,7 @@ public class abNM {
             Cell[][] newBoard = cloneBoard(currentBoard);
             gameUtils.moveStone(newBoard, 9, player, move[0], move[1], move[2], move[3], false);
 
-            int moveValue = negamax(newBoard, d, player.equals("BLACK"));
+            int moveValue = minimax(newBoard, d-1, player.equals("BLACK"));
             if (player.equals("WHITE") && moveValue > bestMoveValue) {
                 bestMoveValue = moveValue;
                 bestMove = move;
@@ -60,7 +60,7 @@ public class abNM {
         }
     }
 
-    public int negamax(Cell[][] board, int depth, boolean isMaximizing) {
+    public int minimax(Cell[][] board, int depth, boolean isMaximizing) {
         nodeCount++; // Increment the node counter
 
         // Base case: if the game is over or max depth is reached
@@ -73,7 +73,7 @@ public class abNM {
             for (int[] move : getAllPossibleMoves("WHITE", board)) {
                 Cell[][] newBoard = cloneBoard(board);  // Clone the board for the new move
                 gameUtils.moveStone(newBoard, 9, "WHITE", move[0], move[1], move[2], move[3], false);
-                int eval = negamax(newBoard, depth - 1, false);
+                int eval = minimax(newBoard, depth - 1, false);
                 maxEval = Math.max(maxEval, eval);
             }
             return maxEval;
@@ -82,7 +82,7 @@ public class abNM {
             for (int[] move : getAllPossibleMoves("BLACK", board)) {
                 Cell[][] newBoard = cloneBoard(board);  // Clone the board for the new move
                 gameUtils.moveStone(newBoard, 9, "BLACK", move[0], move[1], move[2], move[3], false);
-                int eval = negamax(newBoard, depth - 1, true);
+                int eval = minimax(newBoard, depth - 1, true);
                 minEval = Math.min(minEval, eval);
             }
             return minEval;
