@@ -6,7 +6,6 @@ import Utils.BotUtils;
 import Utils.GameUtils;
 
 
-import Game.Cell;
 import Game.Game;
 
 public class Minimax {
@@ -21,15 +20,16 @@ public class Minimax {
         nodeCount = 0; // Initialize the node counter
     }
 
-    public boolean makeMinimaxMove(String player, Cell[][] board, int d) {
+    public boolean makeMove(String player, int[][] board, int d) {
         nodeCount = 0; // Reset node count at the beginning of a new move
         long startTime = System.nanoTime(); // Start timing
-        Cell[][] currentBoard = cloneBoard(board);
+        int[][] currentBoard = cloneBoard(board);
         int bestMoveValue = player.equals("WHITE") ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+        int playerint = player.equals("WHITE") ? 1 : 2;
         int[] bestMove = null;
 
-        for (int[] move : getAllPossibleMoves(player, currentBoard)) {
-            Cell[][] newBoard = cloneBoard(currentBoard);
+        for (int[] move : getAllPossibleMoves(playerint, currentBoard)) {
+            int[][] newBoard = cloneBoard(currentBoard);
             gameUtils.moveStone(newBoard, 9, player, move[0], move[1], move[2], move[3], false);
 
             int moveValue = minimax(newBoard, d-1, player.equals("BLACK"));
@@ -60,7 +60,7 @@ public class Minimax {
         }
     }
 
-    public int minimax(Cell[][] board, int depth, boolean isMaximizing) {
+    public int minimax(int[][] board, int depth, boolean isMaximizing) {
         nodeCount++; // Increment the node counter
 
         // Base case: if the game is over or max depth is reached
@@ -70,8 +70,8 @@ public class Minimax {
 
         if (isMaximizing) {  // WHITE's turn (maximizing)
             int maxEval = Integer.MIN_VALUE;
-            for (int[] move : getAllPossibleMoves("WHITE", board)) {
-                Cell[][] newBoard = cloneBoard(board);  // Clone the board for the new move
+            for (int[] move : getAllPossibleMoves(1, board)) {
+                int[][] newBoard = cloneBoard(board);  // Clone the board for the new move
                 gameUtils.moveStone(newBoard, 9, "WHITE", move[0], move[1], move[2], move[3], false);
                 int eval = minimax(newBoard, depth - 1, false);
                 maxEval = Math.max(maxEval, eval);
@@ -79,8 +79,8 @@ public class Minimax {
             return maxEval;
         } else {  // BLACK's turn (minimizing)
             int minEval = Integer.MAX_VALUE;
-            for (int[] move : getAllPossibleMoves("BLACK", board)) {
-                Cell[][] newBoard = cloneBoard(board);  // Clone the board for the new move
+            for (int[] move : getAllPossibleMoves(2, board)) {
+                int[][] newBoard = cloneBoard(board);  // Clone the board for the new move
                 gameUtils.moveStone(newBoard, 9, "BLACK", move[0], move[1], move[2], move[3], false);
                 int eval = minimax(newBoard, depth - 1, true);
                 minEval = Math.min(minEval, eval);
@@ -94,13 +94,13 @@ public class Minimax {
 
     
 
-    public List<int[]> getAllPossibleMoves(String player, Cell[][] board) {
+    public List<int[]> getAllPossibleMoves(int player, int[][] board) {
         List<int[]> moves = new ArrayList<>();
         // Iterate over the board and add valid moves for the given player
         for (int y = 0; y < board.length; y++) {
             for (int x = 0; x < board[0].length; x++) {
-                Cell cell = board[y][x];
-                if (cell.hasStone() && cell.getStone().getColour().equals(player)) {
+                int cell = board[y][x];
+                if (cell == player) {
                     List<int[]> validDestinations = gameUtils.getValidMoves(x,y, board, 9, false);
                     for (int[] destination : validDestinations) {
                         //System.out.println("from: "+ destination[0] +" "+ destination[1]+" to: "+ destination[2]+" "+destination[3]);
@@ -123,12 +123,12 @@ public class Minimax {
     }
     
 
-    public Cell[][] cloneBoard(Cell[][] board) {
-        Cell[][] newBoard = new Cell[board.length][board.length];
+    public int[][] cloneBoard(int[][] board) {
+        int[][] newBoard = new int[board.length][board.length];
         for (int row = 0; row < board.length; row++) {
             for (int col = 0; col < board.length; col++) {
 
-                newBoard[row][col] = new Cell(board[row][col]); // Assuming a copy constructor exists in Cell class
+                newBoard[row][col] = Integer.valueOf(board[row][col]); // Assuming a copy constructor exists in Cell class
 
             }
         }

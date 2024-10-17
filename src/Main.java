@@ -2,10 +2,10 @@ import java.util.Scanner;
 
 import Bots.RandomBot;
 import Bots.Minimax;
+import Bots.NMABQS;
 import Bots.NegaMaxAB;
 import Utils.BotUtils;
 import Utils.GameUtils;
-import Game.Cell;
 import Game.Game;
 
 public class Main {
@@ -19,7 +19,8 @@ public class Main {
         BotUtils botUtils = new BotUtils();
         Minimax minimax = new Minimax();
         RandomBot randomBot = new RandomBot();
-        NegaMaxAB negaMaxAB = new NegaMaxAB();
+        NegaMaxAB negaMaxAB = new NegaMaxAB(1);
+        NMABQS nmabqs = new NMABQS(1);
 
         // Ask who will play as WHITE and BLACK
         System.out.println("Who will play as WHITE? (Enter 'user', 'random', 'miniamx', or 'negamax')");
@@ -29,6 +30,7 @@ public class Main {
         String blackPlayer = scanner.nextLine().toLowerCase();
 
         gameUtils.printBoard(game.getBoard(), 9);
+        System.out.println(botUtils.evalBoard(game.getBoard(), "WHITE"));
 
         while (playing) {
             boolean succesW = false;
@@ -53,16 +55,16 @@ public class Main {
                 //! ! ! ! ! ! ! ! !  ! ! ! !  ! !   ! ! ! !  !
                 } else if (whitePlayer.equals("minimax")) {
                     // Minimax bot's turn
-                    succesW = minimax.makeMinimaxMove("WHITE", game.getBoard(),3);
+                    succesW = minimax.makeMove("WHITE", game.getBoard(),4);
                 } else if (whitePlayer.equals("negamax")) {
                     // Minimax bot's turn
-                    succesW = negaMaxAB.makeNMMove("WHITE", game.getBoard(), 7);
+                    succesW = nmabqs.makeMove("WHITE", game.getBoard());
                 } 
 
 
 
             }
-
+            game.saveBoard();
             gameUtils.printBoard(game.getBoard(), game.getSize());
             System.out.println(botUtils.evalBoard(game.getBoard(), "WHITE"));
             if (!(gameUtils.gameOver(game.getBoard(), game.getSize()) == 0)) {
@@ -93,18 +95,23 @@ public class Main {
                 //! ! ! ! ! !  ! ! ! !  ! ! !  ! ! ! !  ! ! ! ! 
                 } else if (blackPlayer.equals("minimax")) {
                     // Minimax bot's turn
-                    succesB = minimax.makeMinimaxMove("BLACK", game.getBoard(), 4);
+                    succesB = minimax.makeMove("BLACK", game.getBoard(), 4);
 
                 } else if (blackPlayer.equals("negamax")) {
                     // Minimax bot's turn
-                    succesB = negaMaxAB.makeNMMove("BLACK", game.getBoard(), 7);
+                    succesB = negaMaxAB.makeMove("BLACK", game.getBoard());
                 }
 
 
 
             }
+            game.saveBoard();
 
             gameUtils.printBoard(game.getBoard(), game.getSize());
+            game.undo();
+            game.undo();
+            gameUtils.printBoard(game.getBoard(), game.getSize());
+
             System.out.println(botUtils.evalBoard(game.getBoard(), "WHITE"));
             if (!(gameUtils.gameOver(game.getBoard(), game.getSize()) == 0)) {
                 if (gameUtils.gameOver(game.getBoard(), game.getSize()) == 1) {

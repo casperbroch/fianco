@@ -5,7 +5,7 @@ import java.util.List;
 import Utils.BotUtils;
 import Utils.GameUtils;
 
-public class NegaMaxAB {
+public class NMABQS {
 
     BotUtils botUtils;
     GameUtils gameUtils;
@@ -13,7 +13,7 @@ public class NegaMaxAB {
     private int timeLimitMs; // Time limit in milliseconds
     private int nodesEvaluated; // Number of nodes evaluated
 
-    public NegaMaxAB(int timeLimitSeconds) {
+    public NMABQS(int timeLimitSeconds) {
         botUtils = new BotUtils();
         gameUtils = new GameUtils();
         this.timeLimitMs = timeLimitSeconds * 1000; // Convert seconds to milliseconds
@@ -72,39 +72,78 @@ public class NegaMaxAB {
     }
 
     public int negamax(int[][] board, int depth, int alpha, int beta, String player, String simulator) {
-        if (depth == 0 || !(gameUtils.gameOver(board, 9) == 0)) {
-            nodesEvaluated++; // Increment node count
+        if (depth == 0) {
+            return quiescence(board, alpha, beta, player, simulator, 10);
+        }
+    
+        if (!(gameUtils.gameOver(board, 9) == 0)) {
+            nodesEvaluated++;
             if (player.equals(simulator)) {
                 return botUtils.evalBoard(board, player);
             } else {
                 return -botUtils.evalBoard(board, player);
             }
         }
-
+    
         int simint = simulator.equals("WHITE") ? 1 : 2;
         int maxEval = Integer.MIN_VALUE;
-
+    
         for (int[] move : getAllPossibleMoves(simint, board)) {
             int[][] newBoard = botUtils.cloneBoard(board);
             gameUtils.moveStone(newBoard, 9, simulator, move[0], move[1], move[2], move[3], false);
-
+    
             int eval = -negamax(newBoard, depth - 1, -beta, -alpha, player, simulator.equals("BLACK") ? "WHITE" : "BLACK");
             maxEval = Math.max(maxEval, eval);
-
+    
             alpha = Math.max(alpha, eval);
-
+    
             if (alpha >= beta) {
                 break; // Beta cutoff
             }
-
+    
             // Check if the time limit has been exceeded
             if (System.currentTimeMillis() - startTime >= timeLimitMs) {
                 break;
             }
         }
-
+    
         return maxEval;
     }
+
+    public int quiescence(int[][] board, int alpha, int beta, String player, String simulator, int qDepth) {
+        if (qDepth == 0 || botUtils.isQuiet(board)) {
+            nodesEvaluated++;
+            return player.equals(simulator) ? botUtils.evalBoard(board, player) : -botUtils.evalBoard(board, player);
+        }
+    
+        int simint = simulator.equals("WHITE") ? 1 : 2;
+        int maxEval = Integer.MIN_VALUE;
+    
+        // Get noisy moves (captures or tactical moves)
+        List<int[]> noisyMoves = getAllPossibleMoves(simint, board);
+    
+        for (int[] move : noisyMoves) {
+            int[][] newBoard = botUtils.cloneBoard(board);
+            gameUtils.moveStone(newBoard, 9, simulator, move[0], move[1], move[2], move[3], false);
+    
+            int eval = -quiescence(newBoard, -beta, -alpha, player, simulator.equals("BLACK") ? "WHITE" : "BLACK", qDepth - 1);
+            maxEval = Math.max(maxEval, eval);
+    
+            alpha = Math.max(alpha, eval);
+    
+            if (alpha >= beta) {
+                break; // Beta cutoff
+            }
+    
+            // Check if the time limit has been exceeded
+            if (System.currentTimeMillis() - startTime >= timeLimitMs) {
+                break;
+            }
+        }
+    
+        return maxEval;
+    }
+    
 
     public List<int[]> getAllPossibleMoves(int player, int[][] board) {
         List<int[]> moves = new ArrayList<>();
