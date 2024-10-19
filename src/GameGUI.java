@@ -4,25 +4,22 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import Game.Game;
-import Bots.Minimax;
 import Bots.NMABQS;
-import Bots.NegaMaxAB;
+import Bots.Minimax;
 import Utils.GameUtils;
 
 public class GameGUI extends JFrame {
     private JPanel boardPanel;
     private JTextArea moveLog;
-    private static Timer whiteTimer;
-    private static Timer blackTimer;
     private Game game;
     private int boardSize;
     private JButton[][] buttons;
     private JButton undoButton;
     private JComboBox<String> whitePlayerChoice;
     private JComboBox<String> blackPlayerChoice;
-    private Minimax minimax;
-    private NegaMaxAB negaMaxAB;
     private NMABQS nmabqs;
+    private Minimax minimax;
+
     private GameUtils gameUtils;
     // Variables to track the selected cells
     private int[] selectedCell1 = null;
@@ -35,8 +32,8 @@ public class GameGUI extends JFrame {
         this.boardSize = game.getSize();
         this.buttons = new JButton[boardSize][boardSize];  // Store buttons to update their size
         this.minimax = new Minimax();
-        this.negaMaxAB = new NegaMaxAB(5);
-        this.nmabqs = new NMABQS(10);
+        this.nmabqs = new NMABQS(3);
+
         this.gameUtils = new GameUtils();
 
         // Set up the frame
@@ -53,7 +50,7 @@ public class GameGUI extends JFrame {
 
         
         // Drop-down menu for player selection (Player or Bot)
-        String[] playerOptions = {"NMABQS", "NegaMax", "Player"};
+        String[] playerOptions = {"NMABQS", "MiniMax", "Player"};
         whitePlayerChoice = new JComboBox<>(playerOptions);
         blackPlayerChoice = new JComboBox<>(playerOptions);
 
@@ -161,8 +158,10 @@ public class GameGUI extends JFrame {
 
     // Method to perform the move
     private void makeMove(int[] fromCell, int[] toCell, String colour) {
-        logMove("Attempting move from (" + fromCell[0] + ", " + fromCell[1] + ") to (" + toCell[0] + ", " + toCell[1] + ")");
+        //logMove("Attempting move from (" + fromCell[0] + ", " + fromCell[1] + ") to (" + toCell[0] + ", " + toCell[1] + ")");
         gameUtils.moveStone(game.getBoard(), boardSize, colour, fromCell[1], fromCell[0], toCell[1], toCell[0], true);
+        String towrite = "From: "+gameUtils.translateCoordinates(fromCell[0], fromCell[1])+" to: "+gameUtils.translateCoordinates(toCell[0], toCell[1]);
+        logMove(towrite);
         selectedCell1 = null;
         selectedCell2 = null;
         updateBoard();
@@ -177,14 +176,16 @@ public class GameGUI extends JFrame {
         logMove("Game started: White is " + whitePlayer + ", Black is " + blackPlayer);
 
         Timer gameTimer = new Timer(1000, new ActionListener() {
-            boolean playing = true;
+        boolean playing = true;
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (playing) {
                     if (whiteTurn) {
                         if (whitePlayer.equals("NMABQS")) {
-                            nmabqs.makeMove("WHITE", game.getBoard());
+                            int[] move = nmabqs.makeMove("WHITE", game.getBoard());
+                            String towrite = "From: "+gameUtils.translateCoordinates(move[0], move[1])+" to: "+gameUtils.translateCoordinates(move[2], move[3]);
+                            logMove(towrite);
 
                             
                             updateBoard();
@@ -192,8 +193,8 @@ public class GameGUI extends JFrame {
                             game.saveBoard();
                             whiteTurn = false;
 
-                        } else if (whitePlayer.equals("NegaMax")) {
-                            negaMaxAB.makeMove("WHITE", game.getBoard());
+                        } else if (whitePlayer.equals("MiniMax")) {
+                            minimax.makeMove("WHITE", game.getBoard(), 3);
                             
                             updateBoard();
                             logMove("WHITE made a move.");
@@ -213,15 +214,16 @@ public class GameGUI extends JFrame {
 
                     } else {
                         if (blackPlayer.equals("NMABQS")) {
-                            nmabqs.makeMove("BLACK", game.getBoard());
-
+                            int[] move = nmabqs.makeMove("BLACK", game.getBoard());
+                            String towrite = "From: "+gameUtils.translateCoordinates(move[0], move[1])+" to: "+gameUtils.translateCoordinates(move[2], move[3]);
+                            logMove(towrite);
                             
                             updateBoard();
                             logMove("BLACK made a move.");
                             game.saveBoard();
                             whiteTurn = true;
-                        } else if (blackPlayer.equals("NegaMax")) {
-                            negaMaxAB.makeMove("BLACK", game.getBoard());
+                        } else if (blackPlayer.equals("MiniMax")) {
+                            minimax.makeMove("BLACK", game.getBoard(), 3);
 
                             
                             updateBoard();
@@ -243,6 +245,7 @@ public class GameGUI extends JFrame {
                     // Check if the game is over
                     int gameOverStatus = gameUtils.gameOver(game.getBoard(), game.getSize());
                     if (gameOverStatus != 0) {
+                        System.out.println("Average ply: "+nmabqs.averagePly());
                         playing = false;
                         if (gameOverStatus == 1) {
                             logMove("WHITE WON!");

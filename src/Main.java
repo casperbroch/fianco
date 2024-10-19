@@ -58,7 +58,10 @@ public class Main {
                     succesW = minimax.makeMove("WHITE", game.getBoard(),4);
                 } else if (whitePlayer.equals("negamax")) {
                     // Minimax bot's turn
-                    succesW = nmabqs.makeMove("WHITE", game.getBoard());
+                    int[] move = nmabqs.makeMove("WHITE", game.getBoard());
+                    if (move !=null) {
+                        succesW = true;
+                    }
                 } 
 
 
@@ -106,10 +109,6 @@ public class Main {
 
             }
             game.saveBoard();
-
-            gameUtils.printBoard(game.getBoard(), game.getSize());
-            game.undo();
-            game.undo();
             gameUtils.printBoard(game.getBoard(), game.getSize());
 
             System.out.println(botUtils.evalBoard(game.getBoard(), "WHITE"));

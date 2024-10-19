@@ -87,6 +87,8 @@ public class GameUtils {
         }
     }
 
+
+
     public String translateCoordinates(int x, int y) {
         try {
             // Translate x-coordinate (0-based index) to letter

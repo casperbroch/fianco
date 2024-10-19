@@ -35,6 +35,7 @@ public class BotUtils {
                     // * One point for each position more forward
                     whiteEval=whiteEval+((board[0].length-i)*(board[0].length-i));
                     
+                    
                 } else if (curr == 2) {
 
                     // * One point for each position more forward
@@ -50,6 +51,8 @@ public class BotUtils {
             return blackEval-whiteEval;
         }
     }
+
+    
 
     public int[][] cloneBoard(int[][] board) {
         int[][] newBoard = new int[board.length][board.length];
