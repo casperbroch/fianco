@@ -160,7 +160,7 @@ public class GUIMain extends JFrame {
     private void makeMove(int[] fromCell, int[] toCell, String colour) {
         //logMove("Attempting move from (" + fromCell[0] + ", " + fromCell[1] + ") to (" + toCell[0] + ", " + toCell[1] + ")");
         gameUtils.moveStone(game.getBoard(), boardSize, colour, fromCell[1], fromCell[0], toCell[1], toCell[0], true);
-        String towrite = "From: "+gameUtils.translateCoordinates(fromCell[0], fromCell[1])+" to: "+gameUtils.translateCoordinates(toCell[0], toCell[1]);
+        String towrite = "From: "+gameUtils.translateCoordinates(fromCell[1], fromCell[0])+" to: "+gameUtils.translateCoordinates(toCell[1], toCell[0]);
         logMove(towrite);
         selectedCell1 = null;
         selectedCell2 = null;
