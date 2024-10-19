@@ -8,7 +8,7 @@ import Utils.BotUtils;
 import Utils.GameUtils;
 import Game.Game;
 
-public class Main {
+public class devMain {
     public static void main(String[] args) {
 
         Game game = new Game(9);
