@@ -8,7 +8,7 @@ import Bots.NMABQS;
 import Bots.Minimax;
 import Utils.GameUtils;
 
-public class GameGUI extends JFrame {
+public class GUIMain extends JFrame {
     private JPanel boardPanel;
     private JTextArea moveLog;
     private Game game;
@@ -27,7 +27,7 @@ public class GameGUI extends JFrame {
 
     private boolean whiteTurn = true;
 
-    public GameGUI(Game game) {
+    public GUIMain(Game game) {
         this.game = game;
         this.boardSize = game.getSize();
         this.buttons = new JButton[boardSize][boardSize];  // Store buttons to update their size
@@ -279,6 +279,6 @@ public class GameGUI extends JFrame {
 
     public static void main(String[] args) {
         Game game = new Game(9);  // Example game initialization
-        new GameGUI(game);
+        new GUIMain(game);
     }
 }

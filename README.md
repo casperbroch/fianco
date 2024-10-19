@@ -1,18 +1,20 @@
-## Getting Started
+## NMABQS
+Bot made for the board game, [Fianco](https://boardgamegeek.com/boardgame/184520/fianco), entirely made in Java.
 
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
+### Featrues
+- NegaMax search
+- Alpha/beta pruning
+- Iterative deepening
+- Quiescence search
+- 
 
-## Folder Structure
+### 12th place out of 32 contestants
+This bot ranked 12th on the Maastricht University Fianco tournament. 
 
-The workspace contains two folders by default, where:
+### How/what to run?
+You can launch the program by either running `fianco\Devmain.java` if you want the terminal version of the program or `fianco\GUIMain.java` if you want to launch the Java Swing GUI.
 
-- `src`: the folder to maintain sources
-- `lib`: the folder to maintain dependencies
+## Authors
+[@casperbroch](https://www.github.com/casperbroch)
 
-Meanwhile, the compiled output files will be generated in the `bin` folder by default.
 
-> If you want to customize the folder structure, open `.vscode/settings.json` and update the related settings there.
-
-## Dependency Management
-
-The `JAVA PROJECTS` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
