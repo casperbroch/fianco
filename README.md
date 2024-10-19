@@ -6,7 +6,6 @@ Bot made for the board game, [Fianco](https://boardgamegeek.com/boardgame/184520
 - Alpha/beta pruning
 - Iterative deepening
 - Quiescence search
-- 
 
 ### 12th place out of 32 contestants
 This bot ranked 12th on the Maastricht University Fianco tournament. 
